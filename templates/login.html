@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Mark Six AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* ... (CSS Root & Body sama) ... */
+        :root {
+            --primary-red: #9a1d2d;
+            --border-red: #9f2626;
+            --bright-red: #d10000;
+            --bg-white: #ffffff;
+        }
+
+        body {
+            background-color: #f8f8f8;
+            font-family: 'Nunito Sans', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .login-card {
+            background: var(--bg-white);
+            border: 2px solid var(--border-red);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease-out forwards 0.2s;
+            position: relative;
+        }
+
+        @keyframes slideUp { to { transform: translateY(0); } }
+
+        /* Style untuk tombol Close (Kanan Atas) */
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .close-btn:hover {
+            color: var(--primary-red);
+            transform: rotate(90deg);
+        }
+
+        /* Style untuk tombol Back (Kiri Atas) */
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            color: var(--primary-red);
+            transform: translateX(-5px); /* Geser sedikit ke kiri saat hover */
+        }
+
+        /* ... (Sisa CSS Form sama) ... */
+        .logo-icon {
+            font-size: 50px;
+            color: var(--primary-red);
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-red);
+            margin-bottom: 30px;
+            font-weight: 800;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+
+        button[type="submit"] {
+            background-color: #9f0808;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #d10000;
+            transform: scale(1.02);
+        }
+
+        .toggle-text {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .toggle-text a {
+            color: var(--primary-red);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .error-msg {
+            color: #721c24;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card" id="loginCard">
+        <!-- Tombol Back -->
+        <button class="back-btn" onclick="goBack()" title="Back">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+
+        <!-- Tombol Close -->
+        <button class="close-btn" onclick="closeLogin()" title="Close">
+            <i class="fa-solid fa-times"></i>
+        </button>
+
+        <i class="fa-solid fa-pool-8-ball logo-icon"></i>
+        <h2 id="formTitle">LOGIN</h2>
+        
+        <div id="errorMsg" class="error-msg"></div>
+
+        <form action="/login" method="POST" id="authForm">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Enter username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter password" required>
+            </div>
+            <button type="submit" id="submitBtn">LOGIN</button>
+        </form>
+
+        <div class="toggle-text">
+            <span id="toggleText">Don't have an account?</span> 
+            <a onclick="toggleMode()" id="toggleLink">Register</a>
+        </div>
+    </div>
+
+    <script>
+        let isLogin = true;
+
+        function toggleMode() {
+            isLogin = !isLogin;
+            const title = document.getElementById('formTitle');
+            const btn = document.getElementById('submitBtn');
+            const text = document.getElementById('toggleText');
+            const link = document.getElementById('toggleLink');
+            const form = document.getElementById('authForm');
+
+            if (isLogin) {
+                title.innerText = 'LOGIN';
+                btn.innerText = 'LOGIN';
+                text.innerText = "Don't have an account?";
+                link.innerText = 'Register';
+                form.action = '/login';
+            } else {
+                title.innerText = 'REGISTER';
+                btn.innerText = 'REGISTER';
+                text.innerText = "Already have an account?";
+                link.innerText = 'Login';
+                form.action = '/login';
+            }
+        }
+
+        // Fungsi animasi keluar umum
+        function animateOut(callback) {
+            const card = document.getElementById('loginCard');
+            card.style.transition = "transform 0.5s ease-in, opacity 0.5s ease-in";
+            card.style.transform = "translateY(50px) scale(0.9)";
+            card.style.opacity = "0";
+            
+            setTimeout(callback, 500);
+        }
+
+        function closeLogin() {
+            animateOut(() => {
+                // Reload halaman untuk reset
+                window.location.reload();
+            });
+        }
+
+        function goBack() {
+            animateOut(() => {
+                // Kembali ke halaman sebelumnya di history browser
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    // Fallback jika tidak ada history, reload saja
+                    window.location.reload();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

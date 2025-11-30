@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Six Prediction AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #9a1d2d;
+            --border-red: #9f2626;
+            --bright-red: #d10000;
+            --bg-white: #ffffff;
+            /* Gradient bola 3D */
+            --ball-red: radial-gradient(circle at 30% 30%, #ff4d4d, #9f0808);
+            --ball-blue: radial-gradient(circle at 30% 30%, #4d79ff, #0d0f55);
+            --ball-green: radial-gradient(circle at 30% 30%, #5bff75, #0d550d);
+            --ball-purple: radial-gradient(circle at 30% 30%, #d45bff, #3d0d55);
+        }
+
+        body {
+            background-color: #f8f8f8;
+            font-family: 'Nunito Sans', sans-serif;
+            margin: 0;
+            padding-bottom: 50px;
+            opacity: 0; /* Mulai transparan untuk fade-in */
+            animation: fadeInBody 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInBody {
+            to { opacity: 1; }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* --- Header --- */
+        .header {
+            background-color: var(--primary-red);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 5px rgba(0,0,0,0.2);
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 2rem;
+            transform: translateY(-20px);
+            animation: slideDown 0.6s ease-out forwards;
+        }
+
+        @keyframes slideDown {
+            to { transform: translateY(0); }
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        /* --- Card Styles --- */
+        .card {
+            background: var(--bg-white);
+            border: 2px solid var(--border-red);
+            border-radius: 20px;
+            padding: 25px 40px;
+            box-shadow: 1px 4px 10px rgba(0,0,0,0.15);
+            margin-bottom: 25px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease-out forwards;
+            animation-delay: 0.2s; /* Delay agar muncul berurutan */
+        }
+
+        /* Animasi Card Berurutan */
+        .card:nth-child(2) { animation-delay: 0.3s; }
+        .card:nth-child(3) { animation-delay: 0.4s; }
+        .card:nth-child(4) { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            color: var(--primary-red);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+        }
+
+        /* --- Form --- */
+        .date-form {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        select {
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid var(--bright-red);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            min-width: 80px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        select:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 5px rgba(154, 29, 45, 0.5);
+        }
+
+        button {
+            background-color: #9f0808;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+        button:hover {
+            background-color: #d10000;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(209, 0, 0, 0.4);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Loading Spinner inside Button */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        button.loading .btn-text {
+            visibility: hidden;
+        }
+        button.loading .spinner {
+            display: block;
+        }
+
+        /* --- Balls --- */
+        .ball-container {
+            display: flex;
+            gap: 15px; /* Jarak antar bola sedikit diperlebar */
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+            align-items: center;
+        }
+        .ball {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 2px 5px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+            cursor: default;
+        }
+        
+        /* Animasi Hover pada Bola */
+        .ball:hover {
+            transform: scale(1.2) translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+
+        .ball span {
+            background: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            color: black;
+            z-index: 2;
+        }
+        
+        /* Classes warna bola */
+        .ball-red { background: var(--ball-red); }
+        .ball-blue { background: var(--ball-blue); }
+        .ball-green { background: var(--ball-green); }
+        .ball-purple { background: var(--ball-purple); }
+
+        /* --- Accuracy Stats --- */
+        .accuracy-stat {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            color: var(--primary-red);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .stat-highlight {
+            font-weight: 800;
+            font-size: 2.5rem; /* Lebih besar untuk penekanan */
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+        .card:hover .stat-highlight {
+            transform: scale(1.1);
+            color: #d10000;
+        }
+
+        .accuracy-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--primary-red);
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+        }
+        .circle-number {
+            background-color: #930000;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- Messages --- */
+        .error-msg {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--primary-red);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards 0.5s;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-area">
+            <i class="fa-solid fa-pool-8-ball" style="font-size:30px;"></i>
+            <div style="margin-left: 10px;">
+                <h1>Mark Six Prediction AI</h1>
+            </div>
+        </div>
+        <a href="login.html" style="color: white;">
+            <i class="fa-regular fa-circle-user" style="font-size:30px;"></i>
+        </a>
+    </div>
+
+    <div class="container">
+        
+        <div class="subtitle">Random Forest with a Time-Series Rolling Window approach.</div>
+
+        {% if error %}
+        <div class="error-msg">{{ error }}</div>
+        {% endif %}
+
+        <!-- 1. Card Select Date -->
+        <div class="card">
+            <h3 class="card-title">SELECT DRAW DATE</h3>
+            <form method="POST" action="/" id="predictionForm" onsubmit="handleFormSubmit()">
+                <div class="date-form">
+                    <select id="year" name="year" onchange="updateMonths()"></select>
+                    <select id="month" name="month" onchange="updateDays()"></select>
+                    <select id="day" name="day"></select>
+                </div>
+                <button type="submit" id="predictBtn">
+                    <span class="btn-text">PREDICT NUMBERS</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+        </div>
+
+        {% if result %}
+        <!-- 2. AI Prediction Result -->
+        <div class="card">
+            <h3 class="card-title">AI PREDICTION </h3>
+            <div class="ball-container">
+                {% for ball in result.pred_balls %}
+                <div class="ball {{ ball.color }}" style="animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; animation-delay: {{ loop.index * 0.1 }}s;">
+                    <span>{{ ball.num }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 3. Actual Result -->
+        <div class="card">
+            <h3 class="card-title">ACTUAL RESULT</h3>
+            <div class="ball-container">
+                {% for ball in result.true_balls %}
+                <div class="ball {{ ball.color }}" style="animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; animation-delay: {{ loop.index * 0.1 + 0.5 }}s;">
+                    <span>{{ ball.num }}</span>
+                </div>
+                {% endfor %}
+                
+                {% if result.special_ball %}
+                <div style="font-size: 2rem; font-weight: 900; margin: 0 10px; color: black; animation: popIn 0.5s forwards; opacity: 0; animation-delay: 1.2s;">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <div class="ball {{ result.special_ball.color }}" style="animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; animation-delay: 1.3s;">
+                    <span>{{ result.special_ball.num }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 4. Accuracy Stats -->
+        <div class="card">
+            <h3 class="card-title">PREDICTION ACCURACY</h3>
+            
+            <div class="accuracy-stat">
+                <span class="stat-highlight">{{ result.accuracy }}</span> 
+                <span>Correct out of</span> 
+                <span class="stat-highlight">6</span>
+            </div>
+            
+            <div class="accuracy-footer">
+                <span>MODEL SUCCESSFULLY PREDICTED</span>
+                <div class="circle-number">{{ result.accuracy }}</div>
+                <span>NUMBERS</span>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Animasi Pop-In untuk Bola -->
+    <style>
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+
+    <!-- JavaScript untuk Dropdown dan Loading -->
+    <script>
+        // Data tanggal valid dari backend (format YYYY-MM-DD)
+        const validDates = {{ valid_dates | tojson }};
+        
+        // Parsing data tanggal
+        const dateMap = {};
+        if (validDates && validDates.length > 0) {
+            validDates.forEach(dateStr => {
+                const parts = dateStr.split('-');
+                const y = parseInt(parts[0]);
+                const m = parseInt(parts[1]);
+                const d = parseInt(parts[2]);
+                
+                if (!dateMap[y]) dateMap[y] = {};
+                if (!dateMap[y][m]) dateMap[y][m] = [];
+                dateMap[y][m].push(d);
+            });
+        }
+
+        const yearSelect = document.getElementById('year');
+        const monthSelect = document.getElementById('month');
+        const daySelect = document.getElementById('day');
+
+        // Isi Dropdown Tahun
+        const years = Object.keys(dateMap).sort((a, b) => b - a);
+        years.forEach(y => yearSelect.add(new Option(y, y)));
+
+        function updateMonths() {
+            const y = yearSelect.value;
+            monthSelect.innerHTML = '';
+            
+            if (y && dateMap[y]) {
+                const months = Object.keys(dateMap[y]).sort((a, b) => a - b);
+                months.forEach(m => monthSelect.add(new Option(m, m)));
+            }
+            updateDays();
+        }
+
+        function updateDays() {
+            const y = yearSelect.value;
+            const m = monthSelect.value;
+            daySelect.innerHTML = '';
+            
+            if (y && m && dateMap[y][m]) {
+                const days = dateMap[y][m].sort((a, b) => a - b);
+                days.forEach(d => daySelect.add(new Option(d, d)));
+            }
+        }
+
+        // Inisialisasi dropdown saat halaman dimuat
+        if (years.length > 0) {
+            updateMonths();
+        }
+
+        // Fungsi Loading Button
+        function handleFormSubmit() {
+            const btn = document.getElementById('predictBtn');
+            btn.classList.add('loading');
+            // Mencegah submit ganda (opsional, tapi di sini form akan refresh halaman jadi tidak terlalu kritis)
+            // btn.disabled = true; 
+        }
+    </script>
+</body>
+</html>
