@@ -62,7 +62,7 @@
             transform: rotate(90deg);
         }
 
-        /* Style untuk tombol Back (Kiri Atas) */
+       
         .back-btn {
             position: absolute;
             top: 15px;
@@ -76,10 +76,10 @@
         }
         .back-btn:hover {
             color: var(--primary-red);
-            transform: translateX(-5px); /* Geser sedikit ke kiri saat hover */
+            transform: translateX(-5px); 
         }
 
-        /* ... (Sisa CSS Form sama) ... */
+      
         .logo-icon {
             font-size: 50px;
             color: var(--primary-red);
@@ -248,11 +248,11 @@
                 if (window.history.length > 1) {
                     window.history.back();
                 } else {
-                    // Fallback jika tidak ada history, reload saja
                     window.location.reload();
                 }
             });
         }
     </script>
 </body>
+
 </html>
